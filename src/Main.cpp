@@ -71,9 +71,9 @@ int main() {
   double T_coast = -V_initial / A_g_late;
   double D_coast = (V_initial / 2) * T_coast;
 
-  std::cout << "**burnout velocity (m/s): " << V_initial << "**" << std::endl;
-  std::cout << "**travel time (m/s): " << V_initial << "**" << std::endl;
-  std::cout << "**apogee (m): " << D_burn + D_coast << "**" << std::endl;
+  std::cout << "** burnout velocity (m/s): " << V_initial << "**" << std::endl;
+  std::cout << "** travel time (m/s): " << T_coast + engBurnTime << "**" << std::endl;
+  std::cout << "** apogee (m): " << D_burn + D_coast << "**" << std::endl;
 
   return 0;
 }
