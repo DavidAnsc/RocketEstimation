@@ -2,12 +2,19 @@
 #include <cmath>
 #include "Constants.h"
 
-static double getNoseConeAirDrag(double duration, double avgVelocity, double baseDiameter, double dragCoefficient) {
+static double getNoseConeDragMomentum(double duration, double avgVelocity, double baseDiameter, double dragCoefficient) {
   double area = std::pow((baseDiameter / 2), 2) * Constants::pi;
   printf("area is %.2f\n", area);
   double Fd = 0.5 * dragCoefficient * Constants::airDensity * std::pow(avgVelocity, 2) * area;
   printf("air drag force is %.2f\n", Fd);
   return -Fd * duration;
+}
+static double getNoseConeDragForce(double avgVelocity, double baseDiameter, double dragCoefficient) {
+  double area = std::pow((baseDiameter / 2), 2) * Constants::pi;
+  printf("area is %.2f\n", area);
+  double Fd = 0.5 * dragCoefficient * Constants::airDensity * std::pow(avgVelocity, 2) * area;
+  printf("air drag force is %.2f\n", Fd);
+  return -Fd;
 }
 
 int main() {
@@ -56,7 +63,7 @@ int main() {
   do {
     V_initial = (P_t_initial + P_air_drag) / (rocketMass - prplMass);
     printf("velocity is %.2f\n", V_initial);
-    P_air_drag = getNoseConeAirDrag(engBurnTime, V_initial / 1.732, noseConeD, dragCoefficient);
+    P_air_drag = getNoseConeDragMomentum(engBurnTime, V_initial / 1.732, noseConeD, dragCoefficient);
     // we need to get the avg drag, not avg velocity, that's why we don't use V_initial / 2.
     printf("P_air_drag is %f\n", P_air_drag);
     ++i;
@@ -66,14 +73,19 @@ int main() {
   double D_burn = (V_initial / 2) * engBurnTime;
 
   double F_g_late = -(rocketMass - prplMass) * Constants::g;
+  double F_d_late = getNoseConeDragForce(V_initial / 1.732, noseConeD, dragCoefficient);;
   double A_g_late = F_g_late / (rocketMass - prplMass);
+  double A_d_late = F_d_late / (rocketMass - prplMass);;
 
-  double T_coast = -V_initial / A_g_late;
+  double T_coast {};
+  printf("A_d is %.5fm/s^2\n", A_d_late);
+  T_coast = -V_initial / (A_g_late + A_d_late);
+
   double D_coast = (V_initial / 2) * T_coast;
 
-  std::cout << "** burnout velocity (m/s): " << V_initial << "**" << std::endl;
-  std::cout << "** travel time (m/s): " << T_coast + engBurnTime << "**" << std::endl;
-  std::cout << "** apogee (m): " << D_burn + D_coast << "**" << std::endl;
+  std::cout << "** burnout velocity (m/s): " << V_initial << " **" << std::endl;
+  std::cout << "** travel time (m/s): " << T_coast + engBurnTime << " **" << std::endl;
+  std::cout << "** apogee (m): " << D_burn + D_coast << " **" << std::endl;
 
   return 0;
 }
